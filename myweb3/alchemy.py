@@ -1,9 +1,29 @@
-from .config import load_env
-from web3 import Web3
+from .connection import build_web3
+import click
+import logging
 
-cfg = load_env()
-w3 = Web3(Web3.HTTPProvider(cfg["API_KEY"]))
+log = logging.getLogger(__name__)
+w3 = build_web3()
 
 
-def get_block(idx="latest"):
-    return w3.eth.get_block(idx)
+@click.group()
+def cli():
+    pass
+
+
+@cli.command()
+@click.argument("index", default="latest")
+def get_block(index):
+    log.info('Getting block %s', index)
+    blk = w3.eth.get_block(index)
+    print(blk)
+
+
+@cli.command()
+def foo():
+    print('foo')
+
+
+@cli.command()
+def bar():
+    print('bar')
