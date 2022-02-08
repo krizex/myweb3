@@ -3,6 +3,7 @@ from .config import Config
 from .sendmail import send_mail
 import click
 import logging
+import time
 
 log = logging.getLogger(__name__)
 w3 = build_web3()
@@ -59,8 +60,12 @@ def mine_address():
     cnt = 0
     while True:
         cnt += 1
-        priv_key = _mine_address()
-        log.info('[%d]Mining %s', cnt, priv_key)
+        try:
+            priv_key = _mine_address()
+            log.info('[%d]Mining %s', cnt, priv_key)
+        except:
+            log.exception("Fails to mine")
+            time.sleep(0.1)
 
 
 @cli.command()
