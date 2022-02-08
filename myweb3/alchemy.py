@@ -20,10 +20,11 @@ def get_block(index):
 
 
 @cli.command()
-def foo():
-    print('foo')
+def get_block_number():
+    n = w3.eth.get_block_number()
+    print(n)
 
 
 @cli.command()
-def bar():
-    print('bar')
+def send_tx():
+    pass
