@@ -29,11 +29,6 @@ def get_block_number():
 
 
 @cli.command()
-def send_tx():
-    pass
-
-
-@cli.command()
 @click.argument("address", default="")
 def get_account_balance(address):
     if address == "":
@@ -71,3 +66,21 @@ def mine_address():
 @cli.command()
 def send_email():
     send_mail('A test mail', 'the content')
+
+
+@cli.command()
+@click.argument('address')
+@click.argument('amount')
+def send_tx(address, amount):
+    account = w3.eth.account.from_key(Config["PRIVATE_KEY"])
+    tx = {
+        "nonce": w3.eth.getTransactionCount(account.address),
+        "to": address,
+        "value": w3.toWei(amount, "ether"),
+        "gas": 21000,
+        "gasPrice": w3.toWei("2", "gwei")
+    }
+    log.info("Send to %s: %s", address, tx)
+    signed_tx = account.sign_transaction(tx)
+    tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+    log.info("Tx address: %s", tx_hash.hex())
