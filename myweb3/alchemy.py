@@ -64,7 +64,7 @@ def mine_address():
 
 
 @cli.command()
-def send_email():
+def test_send_email():
     send_mail('A test mail', 'the content')
 
 
