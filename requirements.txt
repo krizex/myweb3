@@ -2,3 +2,4 @@ python-dotenv
 web3
 click
 sendgrid
+py-solc-x

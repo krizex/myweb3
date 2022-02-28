@@ -1,6 +1,7 @@
 from .connection import build_web3
 from .config import Config
 from .sendmail import send_mail
+from .contracts import compile_file
 import click
 import logging
 import time
@@ -84,3 +85,23 @@ def send_tx(address, amount):
     signed_tx = account.sign_transaction(tx)
     tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
     log.info("Tx address: %s", tx_hash.hex())
+
+
+@cli.command()
+@click.argument("contract_file")
+def deploy_contract(contract_file):
+    contract_compiled = compile_file(contract_file)
+    log.info("Contract: %s", contract_compiled)
+    contract_name = "HelloWorld"
+    contract_interface = contract_compiled[contract_file + ":" + contract_name]
+    contract = w3.eth.contract(abi=contract_interface["abi"], bytecode=contract_interface["bin"])
+    myaccount = w3.eth.account.from_key(Config["PRIVATE_KEY"])
+    # FIXME: should update to use send_raw_transaction
+    tx_hash = contract.constructor("My First Message").transact()
+    log.info("TxHash: %s", tx_hash)
+    tx_receipt = w3.eth.get_transaction_receipt(tx_hash)
+    log.info("TxReceipt: %s", tx_receipt)
+    return tx_receipt['contractAddress']
+
+
+
