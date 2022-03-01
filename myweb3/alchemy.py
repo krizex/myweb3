@@ -93,6 +93,7 @@ def deploy_contract(contract_file):
     contract_compiled = compile_file(contract_file)
     log.info("Contract: %s", contract_compiled)
     contract_name = "HelloWorld"
+    log.info("Using contract=%s", contract_name)
     contract_interface = contract_compiled[contract_file + ":" + contract_name]
     contract = w3.eth.contract(abi=contract_interface["abi"], bytecode=contract_interface["bin"])
     myaccount = w3.eth.account.from_key(Config["PRIVATE_KEY"])
@@ -100,13 +101,17 @@ def deploy_contract(contract_file):
     tx_params = {
         "nonce": w3.eth.getTransactionCount(myaccount.address),
     }
-    tx = contract.constructor("My First Message").buildTransaction(tx_params)
+    ctor_param = "My First Message"
+    log.info("Calling contract ctor with: %s", ctor_param)
+    tx = contract.constructor(ctor_param).buildTransaction(tx_params)
     signed_tx = myaccount.sign_transaction(tx)
     tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
     log.info("TxHash: %s", tx_hash.hex())
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
     log.info("TxReceipt: %s", tx_receipt)
-    return tx_receipt['contractAddress']
+    addr = tx_receipt['contractAddress']
+    log.info('Deploy to %s', addr)
+    return addr
 
 
 
