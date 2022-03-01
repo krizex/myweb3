@@ -96,12 +96,13 @@ def deploy_contract(contract_file):
     contract_interface = contract_compiled[contract_file + ":" + contract_name]
     contract = w3.eth.contract(abi=contract_interface["abi"], bytecode=contract_interface["bin"])
     myaccount = w3.eth.account.from_key(Config["PRIVATE_KEY"])
-    # FIXME: should update to use send_raw_transaction
-    tx_hash = contract.constructor("My First Message").transact()
-    log.info("TxHash: %s", tx_hash)
-    tx_receipt = w3.eth.get_transaction_receipt(tx_hash)
-    log.info("TxReceipt: %s", tx_receipt)
-    return tx_receipt['contractAddress']
+    tx_params = {
+        "nonce": w3.eth.getTransactionCount(myaccount.address),
+    }
+    tx = contract.constructor("My First Message").buildTransaction(tx_params)
+    signed_tx = myaccount.sign_transaction(tx)
+    tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+    log.info("TxHash: %s", tx_hash.hex())
 
 
 
