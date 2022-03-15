@@ -35,6 +35,7 @@ def get_account_balance(address):
     if address == "":
         account = w3.eth.account.from_key(Config["PRIVATE_KEY"])
         address = account.address
+    log.info("Address: %s", address)
     balance = w3.eth.get_balance(address)
     print(balance)
 
